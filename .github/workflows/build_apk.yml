@@ -5,6 +5,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,14 +34,33 @@ jobs:
       - name: Build APK Release
         run: flutter build apk --release --split-per-abi
 
-      - name: Upload APK arm64
-        uses: actions/upload-artifact@v4
-        with:
-          name: cleanoov-apk-arm64
-          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+      - name: Rename APK
+        run: |
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk Cleanoov-arm64.apk
+          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk Cleanoov-arm32.apk
 
-      - name: Upload APK arm32
-        uses: actions/upload-artifact@v4
+      - name: Delete old release
+        run: gh release delete latest --yes || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: cleanoov-apk-arm32
-          path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+          tag_name: latest
+          name: "Cleanoov App — Dernière version"
+          body: |
+            ## Application Cleanoov — Nettoyage Panneaux PV
+
+            ### Installation Android
+            1. Télécharge **Cleanoov-arm64.apk** (téléphones récents)
+            2. Ou **Cleanoov-arm32.apk** (anciens téléphones)
+            3. Autorise "Sources inconnues" dans les paramètres Android
+            4. Lance le fichier APK téléchargé
+
+          files: |
+            Cleanoov-arm64.apk
+            Cleanoov-arm32.apk
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

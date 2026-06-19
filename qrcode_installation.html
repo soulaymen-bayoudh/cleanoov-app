@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Installer Cleanoov</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0A0E1A 0%, #111827 60%, #0D1A0F 100%);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    color: white; padding: 20px;
+  }
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 40px 36px;
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+  }
+  .logo { height: 60px; object-fit: contain; margin-bottom: 8px; }
+  .tagline { color: #6B7280; font-size: 13px; margin-bottom: 30px; }
+  .qr-box {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    display: inline-block;
+    margin-bottom: 24px;
+    box-shadow: 0 0 40px rgba(34,163,83,0.3);
+  }
+  .qr-box img { display: block; border-radius: 8px; }
+  h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .subtitle { color: #9CA3AF; font-size: 13px; margin-bottom: 24px; }
+  .step {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 8px 0;
+    display: flex; align-items: center; gap: 12px;
+    text-align: left;
+  }
+  .step-num {
+    background: #22A353;
+    color: white;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .step-txt { font-size: 13px; color: #D1D5DB; }
+  .step-txt strong { color: white; }
+  .btn {
+    display: block;
+    background: #22A353;
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-weight: 700;
+    font-size: 15px;
+    margin-top: 24px;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-secondary {
+    background: rgba(255,255,255,0.08);
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #9CA3AF;
+  }
+  .badge {
+    display: inline-block;
+    background: rgba(34,163,83,0.2);
+    border: 1px solid rgba(34,163,83,0.4);
+    color: #22A353;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  @media print {
+    body { background: white; }
+    .card { border: 2px solid #E5E7EB; box-shadow: none; }
+    .btn, .btn-secondary { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <img src="assets/images/logo_dark.png" alt="Cleanoov" class="logo"
+       onerror="this.style.display='none'; document.getElementById('logo-txt').style.display='block'">
+  <div id="logo-txt" style="display:none; font-size:28px; font-weight:900; color:white; letter-spacing:2px; margin-bottom:8px;">
+    CLEA<span style="color:#22A353">N</span>OOV
+  </div>
+  <div class="tagline">Nettoyage Intelligent de Panneaux Photovoltaïques</div>
+  <div class="badge">📱 Application Android</div>
+
+  <div class="qr-box">
+    <img
+      src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://github.com/soulaymen-bayoudh/cleanoov-app/releases/latest/download/Cleanoov-arm64.apk&color=0A0E1A&bgcolor=ffffff&qzone=1&format=png"
+      alt="QR Code Cleanoov"
+      width="220" height="220"
+    >
+  </div>
+
+  <h2>Scannez pour installer</h2>
+  <div class="subtitle">Scannez avec l'appareil photo Android<br>ou téléchargez directement</div>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-txt">Scannez le QR code ou cliquez <strong>"Télécharger APK"</strong></div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-txt">Android → Paramètres → <strong>Autoriser les sources inconnues</strong></div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-txt">Ouvrez le fichier <strong>Cleanoov-arm64.apk</strong> téléchargé</div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-txt">Cliquez <strong>Installer</strong> → Lancez l'application</div>
+  </div>
+
+  <a class="btn"
+     href="https://github.com/soulaymen-bayoudh/cleanoov-app/releases/latest/download/Cleanoov-arm64.apk">
+    ⬇ Télécharger APK (arm64 — téléphones récents)
+  </a>
+  <a class="btn btn-secondary"
+     href="https://github.com/soulaymen-bayoudh/cleanoov-app/releases/latest/download/Cleanoov-arm32.apk">
+    ⬇ Télécharger APK (arm32 — anciens téléphones)
+  </a>
+</div>
+</body>
+</html>
