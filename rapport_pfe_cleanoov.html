@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapport PFE — Cleanoov</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; background: #fff; font-size: 13px; line-height: 1.6; }
+
+  /* PAGE COUVERTURE */
+  .cover {
+    page-break-after: always;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0A0E1A 0%, #111827 60%, #0D1A0F 100%);
+    color: white; text-align: center; padding: 60px 40px;
+  }
+  .cover-logo { font-size: 56px; font-weight: 900; letter-spacing: 4px; margin-bottom: 8px; display:none; }
+  .cover-logo span { color: #22A353; }
+  .cover-tagline { color: #9CA3AF; font-size: 14px; margin-bottom: 50px; letter-spacing: 1px; }
+  .cover-title { font-size: 22px; font-weight: 700; color: #22A353; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; border: 2px solid #22A353; padding: 12px 30px; border-radius: 4px; }
+  .cover-subtitle { font-size: 18px; color: #E5E7EB; margin-bottom: 50px; max-width: 500px; }
+  .cover-info { margin-top: 40px; color: #9CA3AF; font-size: 12px; line-height: 2; }
+  .cover-info strong { color: #E5E7EB; }
+  .cover-badge { margin-top: 30px; padding: 8px 20px; background: #22A353; border-radius: 20px; font-size: 12px; font-weight: 600; color: white; }
+  .cover-year { margin-top: 60px; color: #6B7280; font-size: 13px; }
+
+  /* CONTENU */
+  .page { padding: 40px 50px; max-width: 900px; margin: 0 auto; }
+  @media print {
+    .page { padding: 20px 40px; }
+    .page-break { page-break-before: always; }
+    .cover { min-height: 100vh; }
+  }
+
+  h1 { font-size: 20px; color: #0A0E1A; border-left: 5px solid #22A353; padding-left: 14px;
+       margin: 32px 0 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  h2 { font-size: 15px; color: #22A353; margin: 24px 0 10px; font-weight: 700; }
+  h3 { font-size: 13px; color: #374151; margin: 16px 0 8px; font-weight: 600; }
+  p { margin-bottom: 10px; color: #374151; }
+
+  /* TOC */
+  .toc { background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 8px; padding: 24px 30px; margin: 20px 0 30px; }
+  .toc h2 { color: #0A0E1A; margin-top: 0; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; color: #374151; }
+  .toc a { color: #22A353; text-decoration: none; font-weight: 500; }
+
+  /* DIAGRAMMES */
+  pre {
+    background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 6px;
+    padding: 18px 20px; font-family: 'Courier New', monospace; font-size: 11px;
+    overflow-x: auto; line-height: 1.5; margin: 12px 0; white-space: pre;
+  }
+
+  /* TABLEAUX */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12px; }
+  thead tr { background: #0A0E1A; color: white; }
+  thead th { padding: 10px 14px; text-align: left; font-weight: 600; }
+  tbody tr:nth-child(even) { background: #F8FAFC; }
+  tbody tr:hover { background: #EFF6FF; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid #E5E7EB; color: #374151; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; }
+  .badge-green { background: #DCFCE7; color: #166534; }
+  .badge-blue { background: #DBEAFE; color: #1E40AF; }
+  .badge-red { background: #FEE2E2; color: #991B1B; }
+  .badge-grey { background: #F3F4F6; color: #374151; }
+
+  /* ÉCRANS */
+  .screens-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .screen-card { border: 1px solid #E5E7EB; border-radius: 8px; overflow: hidden; }
+  .screen-card-header { background: #0A0E1A; color: white; padding: 8px 14px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .screen-card-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #22A353; }
+  .screen-card-body { padding: 14px; font-size: 11px; }
+  .screen-card-body ul { padding-left: 18px; }
+  .screen-card-body li { margin: 4px 0; color: #374151; }
+
+  /* STACK */
+  .tech-stack { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+  .tech-item { background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 8px; padding: 14px; text-align: center; }
+  .tech-item .tech-name { font-weight: 700; color: #0A0E1A; font-size: 13px; }
+  .tech-item .tech-version { color: #22A353; font-size: 11px; font-weight: 600; }
+  .tech-item .tech-role { color: #6B7280; font-size: 10px; margin-top: 4px; }
+
+  /* FIRESTORE */
+  .firestore { background: #FFF8F0; border: 1px solid #FED7AA; border-radius: 8px; padding: 20px; margin: 14px 0; }
+  .collection { margin-bottom: 16px; }
+  .collection-title { font-weight: 700; color: #C2410C; font-size: 13px; margin-bottom: 8px; }
+  .doc-field { font-family: monospace; font-size: 11px; color: #374151; margin: 3px 0 3px 20px; }
+  .doc-field span { color: #059669; }
+
+  /* SÉQUENCE */
+  .seq { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 20px; margin: 14px 0; }
+
+  /* FOOTER */
+  .footer { margin-top: 40px; padding-top: 16px; border-top: 2px solid #E5E7EB; text-align: center; color: #9CA3AF; font-size: 11px; }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid #E5E7EB; margin: 24px 0; }
+
+  /* INFO BOX */
+  .info-box { background: #EFF6FF; border-left: 4px solid #3B82F6; border-radius: 4px; padding: 14px 18px; margin: 14px 0; font-size: 12px; color: #1E40AF; }
+  .success-box { background: #F0FDF4; border-left: 4px solid #22A353; border-radius: 4px; padding: 14px 18px; margin: 14px 0; font-size: 12px; color: #166534; }
+
+  .section-number { display: inline-block; background: #22A353; color: white; width: 24px; height: 24px; border-radius: 50%; text-align: center; line-height: 24px; font-size: 11px; font-weight: 700; margin-right: 8px; }
+
+  @media print {
+    body { font-size: 11px; }
+    .screens-grid { grid-template-columns: 1fr 1fr; }
+    .tech-stack { grid-template-columns: repeat(3, 1fr); }
+    pre { font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ PAGE COUVERTURE -->
+<div class="cover">
+  <img src="assets/images/logo_dark.png" alt="Cleanoov" style="height:80px;object-fit:contain;margin-bottom:10px;">
+  <div class="cover-tagline">Nettoyage intelligent de panneaux photovoltaïques</div>
+  <div class="cover-title">Documentation Logicielle</div>
+  <div class="cover-subtitle">Application Mobile de Gestion des Interventions de Nettoyage de Panneaux Solaires</div>
+  <div class="cover-badge">Rapport de Projet de Fin d'Études (PFE)</div>
+  <div class="cover-info">
+    <p><strong>Framework :</strong> Flutter 3.44.2 &nbsp;|&nbsp; <strong>Backend :</strong> Firebase</p>
+    <p><strong>Plateforme :</strong> Android / iOS / Web</p>
+    <p><strong>Étudiant :</strong> Souleyman Bayoudh</p>
+    <p><strong>Email :</strong> soulaymenbayoudh9@gmail.com</p>
+  </div>
+  <div class="cover-year">Année Universitaire 2025 — 2026</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ CONTENU -->
+<div class="page">
+
+  <!-- TABLE DES MATIÈRES -->
+  <div class="toc">
+    <h2>Table des Matières</h2>
+    <ol>
+      <li><a href="#intro">Introduction & Présentation du projet</a></li>
+      <li><a href="#architecture">Architecture Technique</a></li>
+      <li><a href="#uc">Diagramme de Cas d'Utilisation</a></li>
+      <li><a href="#classes">Diagramme de Classes</a></li>
+      <li><a href="#sequence">Diagramme de Séquence</a></li>
+      <li><a href="#navigation">Diagramme de Navigation</a></li>
+      <li><a href="#bdd">Schéma de la Base de Données</a></li>
+      <li><a href="#interfaces">Description des Interfaces</a></li>
+      <li><a href="#tech">Stack Technologique</a></li>
+    </ol>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── 1. INTRODUCTION -->
+  <h1 id="intro"><span class="section-number">1</span> Introduction & Présentation du Projet</h1>
+
+  <p><strong>Cleanoov</strong> est une application mobile développée avec Flutter, destinée aux techniciens spécialisés dans le nettoyage et la maintenance de panneaux photovoltaïques. Elle permet de digitaliser et structurer l'ensemble du processus d'intervention terrain, depuis l'enregistrement des informations client jusqu'à la génération automatique d'un rapport PDF professionnel.</p>
+
+  <h2>Objectifs principaux</h2>
+  <table>
+    <thead><tr><th>Objectif</th><th>Description</th><th>Statut</th></tr></thead>
+    <tbody>
+      <tr><td>Authentification sécurisée</td><td>Connexion Firebase + création de compte technicien</td><td><span class="badge badge-green">Réalisé</span></td></tr>
+      <tr><td>Fiche d'intervention guidée</td><td>Processus en 5 étapes structurées</td><td><span class="badge badge-green">Réalisé</span></td></tr>
+      <tr><td>Capture photos</td><td>Photos avant/après nettoyage intégrées au rapport</td><td><span class="badge badge-green">Réalisé</span></td></tr>
+      <tr><td>Génération PDF</td><td>Rapport professionnel avec logo, données, photos, prix</td><td><span class="badge badge-green">Réalisé</span></td></tr>
+      <tr><td>Tableau de bord admin</td><td>Suivi global des missions, KPI, revenu total</td><td><span class="badge badge-green">Réalisé</span></td></tr>
+      <tr><td>Stockage Cloud</td><td>Firebase Firestore pour les profils techniciens</td><td><span class="badge badge-green">Réalisé</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── 2. ARCHITECTURE -->
+  <div class="page-break"></div>
+  <h1 id="architecture"><span class="section-number">2</span> Architecture Technique</h1>
+
+  <p>L'application suit une architecture en couches (Layered Architecture) adaptée au paradigme Flutter, séparant clairement la présentation, la logique métier, et l'accès aux données.</p>
+
+<pre>
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        APPLICATION CLEANOOV                             │
+│                        Flutter 3.44.2 — Dart                            │
+├─────────────────────────────────────────────────────────────────────────┤
+│  COUCHE PRÉSENTATION (UI — Widgets Flutter)                              │
+│                                                                          │
+│  ┌───────────────┐  ┌───────────────┐  ┌──────────────────────────┐    │
+│  │  LoginScreen  │  │  SignupScreen  │  │      HomeScreen          │    │
+│  │  AdminLogin   │  │               │  │      AdminDashboard       │    │
+│  └───────────────┘  └───────────────┘  └──────────────────────────┘    │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │               FLUX D'INTERVENTION — 5 Étapes                    │   │
+│  │  ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐   │   │
+│  │  │Étape 1 │─►│Étape 2 │─►│Étape 3 │─►│Étape 4 │─►│Étape 5 │   │   │
+│  │  │Infos   │  │Avant   │  │Nettoyage│ │Après   │  │Valid.  │   │   │
+│  │  │Client  │  │Nettoy. │  │Effectué │ │Nettoy. │  │+ PDF   │   │   │
+│  │  └────────┘  └────────┘  └────────┘  └────────┘  └────────┘   │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+├─────────────────────────────────────────────────────────────────────────┤
+│  COUCHE SERVICES (Logique métier)                                        │
+│                                                                          │
+│  ┌───────────────┐  ┌────────────────┐  ┌──────────────────────────┐   │
+│  │  AuthService  │  │ StorageService  │  │       PdfService         │   │
+│  │  Firebase Auth│  │ SharedPrefs    │  │   package:pdf / printing  │   │
+│  │  + Fallback   │  │ JSON local     │  │                          │   │
+│  └───────────────┘  └────────────────┘  └──────────────────────────┘   │
+├─────────────────────────────────────────────────────────────────────────┤
+│  COUCHE MODÈLES (Données)                                                │
+│                                                                          │
+│  ┌──────────────────────────────┐    ┌─────────────────────────────┐   │
+│  │     InterventionModel        │    │     TechnicienProfile        │   │
+│  │  Serialisation JSON          │    │     (uid, nom, tel, isAdmin) │   │
+│  └──────────────────────────────┘    └─────────────────────────────┘   │
+├─────────────────────────────────────────────────────────────────────────┤
+│  BACKEND — Firebase (Google Cloud)                                       │
+│                                                                          │
+│  ┌──────────────────────┐    ┌───────────────────────────────────────┐  │
+│  │   Firebase Auth      │    │         Cloud Firestore               │  │
+│  │   Authentification   │    │   Collection: techniciens             │  │
+│  │   Email / Password   │    │   Champs: nom, email, tel, isAdmin    │  │
+│  └──────────────────────┘    └───────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘</pre>
+
+  <!-- ── 3. CAS D'UTILISATION -->
+  <div class="page-break"></div>
+  <h1 id="uc"><span class="section-number">3</span> Diagramme de Cas d'Utilisation</h1>
+
+  <p>Deux acteurs principaux interagissent avec le système : le <strong>Technicien</strong> et l'<strong>Administrateur</strong>.</p>
+
+<pre>
+                   ┌──────────────────────────────────────────────────────┐
+                   │                  SYSTÈME CLEANOOV                    │
+                   │                                                       │
+  ┌────────────┐   │   ◯ S'inscrire (créer un compte)                    │
+  │            │───┤   ◯ Se connecter avec email/mot de passe             │
+  │ TECHNICIEN │   │   ◯ Réinitialiser le mot de passe                   │
+  │            │───┤   ◯ Créer une nouvelle fiche d'intervention         │
+  │    [T]     │   │   ◯ Saisir les informations client                  │
+  └────────────┘   │   ◯ Enregistrer l'état AVANT nettoyage              │
+       │           │   ◯ Prendre des photos (caméra ou galerie)          │
+       │           │   ◯ Choisir la méthode de nettoyage                 │
+       │           │   ◯ Saisir les résultats APRÈS nettoyage            │
+       │           │   ◯ Définir le prix de la mission (TND)             │
+       │           │   ◯ Générer et partager le rapport PDF              │
+       │           │   ◯ Marquer la mission comme terminée               │
+       │           │   ◯ Se déconnecter                                   │
+       │           │                                                       │
+  ┌────┴───────┐   │   ◯ Se connecter (espace administrateur)            │
+  │            │───┤   ◯ Visualiser toutes les interventions              │
+  │   ADMIN    │   │   ◯ Consulter les indicateurs de performance (KPI)  │
+  │            │───┤   ◯ Rechercher et filtrer les fiches                │
+  │    [A]     │   │   ◯ Voir le détail d'une mission                    │
+  └────────────┘   │   ◯ Exporter le PDF d'une mission                   │
+                   │   ◯ Voir le revenu total des missions               │
+                   └──────────────────────────────────────────────────────┘
+   [T] inclut [A] pour la connexion</pre>
+
+  <!-- ── 4. CLASSES -->
+  <div class="page-break"></div>
+  <h1 id="classes"><span class="section-number">4</span> Diagramme de Classes</h1>
+
+<pre>
+┌───────────────────────────────────────────────────────────────┐
+│                      InterventionModel                        │
+├───────────────────────────────────────────────────────────────┤
+│  - id                  : String                               │
+│  - numeroFiche         : String       (ex: CLN-20260618-042)  │
+│  - nomPrenom           : String                               │
+│  - telephone           : String                               │
+│  - adresse             : String                               │
+│  - puissanceInstallee  : double       (kWc)                   │
+│  - nombrePanneaux      : int                                  │
+│  - dateIntervention    : DateTime                             │
+│  - prochaineIntervention: DateTime?                           │
+│  - technicien          : String                               │
+│  - technicienTelephone : String                               │
+│  - puissanceAvant      : double?      (Watts)                 │
+│  - niveauEncrassement  : String       (leger/moyen/severe)    │
+│  - pointsChaudes       : bool                                 │
+│  - nbPointsChaudes     : int                                  │
+│  - fissures            : bool                                 │
+│  - coffretAC           : String       (ok/anomalie)           │
+│  - onduleur            : String       (ok/anomalie)           │
+│  - visserie            : String       (ok/desserree/manquante)│
+│  - cablesConnecteurs   : String       (ok/anomalie)           │
+│  - coffretDC           : String       (ok/anomalie)           │
+│  - structureAncrages   : String       (ok/anomalie)           │
+│  - ombragePartiel      : bool                                 │
+│  - observationsAvant   : String                               │
+│  - photosAvant         : List&lt;String&gt; (chemins images)        │
+│  - methodeNettoyage    : String       (brosse/robot)          │
+│  - produitUtilise      : String                               │
+│  - dureeParJour        : double       (heures)                │
+│  - puissanceApres      : double?      (Watts)                 │
+│  - pointsChaudsTraites : String       (resolus/persistants/na)│
+│  - etatGeneral         : String       (excellent/bon/moyen/…) │
+│  - recommandation      : String       (aucune/devis/steg)     │
+│  - observationsApres   : String                               │
+│  - photosApres         : List&lt;String&gt;                         │
+│  - luEtApprouve        : bool                                 │
+│  - prixMission         : double       (TND)                   │
+│  - termine             : bool                                 │
+├───────────────────────────────────────────────────────────────┤
+│  + toJson()            : Map&lt;String, dynamic&gt;                 │
+│  + fromJson()          : InterventionModel                    │
+│  + generateNumero()    : String   [static]                    │
+└───────────────────────────────────────────────────────────────┘
+          ▲ créé par                     ▲ stocké dans
+┌─────────────────────────┐    ┌─────────────────────────────────┐
+│    TechnicienProfile    │    │         StorageService          │
+├─────────────────────────┤    ├─────────────────────────────────┤
+│ + uid       : String    │    │ + saveIntervention(m)           │
+│ + nom       : String    │    │ + loadInterventions()           │
+│ + telephone : String    │    │ + loadTerminees()               │
+│ + isAdmin   : bool      │    │ + saveTechnicienTel(tel)        │
+└─────────────────────────┘    │ + getTechnicienTel()            │
+          ▲ géré par           └─────────────────────────────────┘
+┌─────────────────────────┐
+│       AuthService       │           ┌─────────────────────┐
+├─────────────────────────┤           │      PdfService      │
+│ + signUp(e,p,n,t)       │           ├─────────────────────┤
+│ + signIn(e,p)           │           │ + generateAndShare() │
+│ + signOut()             │           └─────────────────────┘
+│ + getCurrentProfile()   │
+│ + resetPassword(email)  │
+└─────────────────────────┘</pre>
+
+  <!-- ── 5. SÉQUENCE -->
+  <div class="page-break"></div>
+  <h1 id="sequence"><span class="section-number">5</span> Diagramme de Séquence</h1>
+
+  <h2>5.1 — Inscription et Connexion</h2>
+<pre>
+ Utilisateur     LoginScreen      AuthService      Firebase       HomeScreen
+     │                │                │               │               │
+     │──[Signup]──────►               │               │               │
+     │                │──signUp()─────►               │               │
+     │                │                │──createUser()►               │
+     │                │                │◄──userCred────│               │
+     │                │                │──setDoc()─────►               │
+     │                │                │    (Firestore)│               │
+     │                │◄──profil────────               │               │
+     │                │──────────────────────────────────────────────►│
+     │◄──Bienvenue!───│                │               │               │
+     │                │                │               │               │
+     │──[Login]───────►               │               │               │
+     │                │──signIn()─────►               │               │
+     │                │                │──signIn()─────►               │
+     │                │                │◄──user cred───│               │
+     │                │                │──getDoc()─────►               │
+     │                │                │◄──profil doc──│               │
+     │                │◄──profil────────               │               │
+     │                │──────────────────────────────────────────────►│
+     │◄──Accueil───────────────────────────────────────────────────────│</pre>
+
+  <h2>5.2 — Création d'une intervention et génération PDF</h2>
+<pre>
+ Technicien   HomeScreen   InterventionFlow   StorageService   PdfService
+     │              │               │                │              │
+     │──Nv Fiche────►              │                │              │
+     │              │──Ouvrir──────►               │              │
+     │              │               │                │              │
+     │──Étape 1──────────────────────►              │              │
+     │  (Infos Client)              │                │              │
+     │──Étape 2──────────────────────►              │              │
+     │  (Avant nettoyage + photos)  │                │              │
+     │──Étape 3──────────────────────►              │              │
+     │  (Méthode nettoyage)         │                │              │
+     │──Étape 4──────────────────────►              │              │
+     │  (Après nettoyage + photos)  │                │              │
+     │──Étape 5 + Prix───────────────►              │              │
+     │  (Validation)                │                │              │
+     │──Terminer mission─────────────────────────────►              │
+     │                              │                │──save()      │
+     │──Générer PDF──────────────────────────────────────────────────►
+     │                              │                │  generateAndShare()
+     │                              │                │──charger logo │
+     │                              │                │──charger photos
+     │◄──PDF téléchargé──────────────────────────────────────────────│</pre>
+
+  <!-- ── 6. NAVIGATION -->
+  <div class="page-break"></div>
+  <h1 id="navigation"><span class="section-number">6</span> Diagramme de Navigation</h1>
+
+<pre>
+                      ┌──────────────────────┐
+                      │    DÉMARRAGE APP     │
+                      │  Firebase AuthGate   │
+                      │  (auto-login check)  │
+                      └──────────┬───────────┘
+                                 │
+                    ┌────────────┴────────────┐
+                    │                         │
+              connecté                  non connecté
+                    │                         │
+                    ▼                         ▼
+             ┌────────────┐         ┌──────────────────┐
+             │ HomeScreen │         │   Login Screen   │
+             │            │         │ email + password │
+             └─────┬──────┘         └────────┬─────────┘
+                   │                         │
+         ┌─────────┘            ┌────────────┼──────────────┐
+         │                      │            │              │
+         ▼               ┌──────▼──┐  ┌─────▼──────┐  ┌───▼────────┐
+  ┌──────────────┐        │ Login   │  │  Signup    │  │ Espace     │
+  │ Intervention │        │ Success │  │  Screen    │  │ Admin      │
+  │    Flow      │        └──────┬──┘  └────────────┘  └───┬────────┘
+  └──────┬───────┘               │                         │
+         │                       └─────────────────────────►│
+         │                                          ┌────────▼──────┐
+  ┌──────┼──────────────────────────────────┐       │ Admin         │
+  │      │                                  │       │ Dashboard     │
+  ▼      ▼       ▼        ▼        ▼        ▼       │ • KPI         │
+ Ét.1  Ét.2    Ét.3     Ét.4     Ét.5   Génère     │ • Tableau     │
+ Infos  Avant   Nett.   Après   Valid.   PDF        │ • Recherche   │
+ Client Nett.   Effec.  Nett.   +Prix               │ • Export PDF  │
+                                                    └───────────────┘</pre>
+
+  <!-- ── 7. BASE DE DONNÉES -->
+  <div class="page-break"></div>
+  <h1 id="bdd"><span class="section-number">7</span> Schéma de la Base de Données</h1>
+
+  <h2>7.1 — Cloud Firestore (Firebase)</h2>
+  <div class="firestore">
+    <div class="collection">
+      <div class="collection-title">📁 Collection : techniciens</div>
+      <div class="doc-field">📄 Document ID = <span>uid Firebase Auth</span></div>
+      <div class="doc-field">&nbsp;&nbsp;nom &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span>string</span> &nbsp;→ ex: "Soulaymen Bayoudh"</div>
+      <div class="doc-field">&nbsp;&nbsp;email &nbsp;&nbsp;&nbsp;: <span>string</span> &nbsp;→ ex: "tech@cleanoov.com"</div>
+      <div class="doc-field">&nbsp;&nbsp;telephone: <span>string</span> &nbsp;→ ex: "27773723"</div>
+      <div class="doc-field">&nbsp;&nbsp;isAdmin &nbsp;: <span>boolean</span> → false (technicien) / true (admin)</div>
+      <div class="doc-field">&nbsp;&nbsp;createdAt: <span>timestamp</span> → date de création du compte</div>
+    </div>
+  </div>
+
+  <h2>7.2 — SharedPreferences (Stockage local appareil)</h2>
+  <table>
+    <thead><tr><th>Clé</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>interventions</code></td><td>String (JSON Array)</td><td>Liste complète des fiches d'intervention sérialisées</td></tr>
+      <tr><td><code>technicien_tel</code></td><td>String</td><td>Numéro de téléphone du technicien connecté</td></tr>
+    </tbody>
+  </table>
+
+  <h2>7.3 — Structure d'une fiche JSON (SharedPreferences)</h2>
+<pre>
+{
+  "id": "uuid-v4",
+  "numeroFiche": "CLN-20260618-042",
+  "nomPrenom": "Ahmed Ben Ali",
+  "telephone": "23456789",
+  "adresse": "Route de Sfax km 5, Mahdia",
+  "puissanceInstallee": 10.5,
+  "nombrePanneaux": 24,
+  "dateIntervention": "2026-06-18T09:00:00.000",
+  "technicien": "Soulaymen",
+  "technicienTelephone": "27773723",
+  "puissanceAvant": 8200,
+  "niveauEncrassement": "moyen",
+  "pointsChaudes": false,
+  "methodeNettoyage": "robot",
+  "puissanceApres": 9800,
+  "etatGeneral": "bon",
+  "prixMission": 250.000,
+  "termine": true,
+  "luEtApprouve": true,
+  "photosAvant": ["blob:http://..."],
+  "photosApres": ["blob:http://..."]
+}</pre>
+
+  <!-- ── 8. INTERFACES -->
+  <div class="page-break"></div>
+  <h1 id="interfaces"><span class="section-number">8</span> Interfaces Utilisateur — Maquettes & Captures</h1>
+  <p>Les captures ci-dessous présentent les écrans principaux de l'application Cleanoov.</p>
+
+  <style>
+    /* ── Phone frame ── */
+    .mock-wrap { display:flex; align-items:flex-start; gap:24px; margin:24px 0; }
+    .mock-wrap.reverse { flex-direction:row-reverse; }
+    .phone { width:200px; min-width:200px; border-radius:28px; border:3px solid #222; background:#fff; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.25); }
+    .phone-bar { background:#111; height:22px; display:flex; align-items:center; justify-content:center; }
+    .phone-bar span { width:50px; height:5px; background:#333; border-radius:3px; display:block; }
+    .phone-screen { overflow:hidden; }
+    .mock-info { flex:1; }
+    .mock-info h3 { color:#1B3A6B; font-size:14px; margin-bottom:8px; border-bottom:2px solid #22A353; padding-bottom:6px; }
+    .mock-info ul { padding-left:18px; }
+    .mock-info li { margin:5px 0; color:#374151; font-size:12px; }
+
+    /* ── Login screen ── */
+    .s-login { background:linear-gradient(160deg,#0A0E1A,#111827 60%,#0D1A0F); padding:16px 14px; min-height:380px; display:flex; flex-direction:column; align-items:center; }
+    .s-sun { width:54px; height:54px; background:radial-gradient(circle,#FCD34D,#F59E0B); border-radius:50%; margin:16px auto 8px; box-shadow:0 0 20px #FCD34D88; }
+    .s-logo-txt { color:#fff; font-size:16px; font-weight:900; letter-spacing:2px; margin-bottom:2px; }
+    .s-logo-txt span { color:#22A353; }
+    .s-tagline { color:#6B7280; font-size:8px; margin-bottom:14px; }
+    .s-field { background:#1F2937; border-radius:8px; padding:6px 10px; margin:4px 0; width:100%; color:#9CA3AF; font-size:9px; }
+    .s-field label { color:#6B7280; font-size:7px; display:block; }
+    .s-btn { background:#22A353; border-radius:8px; color:#fff; font-size:9px; font-weight:700; text-align:center; padding:8px; width:100%; margin-top:8px; }
+    .s-btn-admin { background:#F59E0B; border-radius:8px; color:#111; font-size:9px; font-weight:700; text-align:center; padding:6px; width:100%; margin-top:6px; }
+    .s-link { color:#22A353; font-size:8px; text-align:center; margin-top:8px; }
+
+    /* ── Home screen ── */
+    .s-home { background:#F8FAFC; min-height:380px; }
+    .s-home-hdr { background:linear-gradient(135deg,#1B3A6B,#0F2552); padding:14px 12px; color:#fff; }
+    .s-home-name { font-size:10px; font-weight:700; }
+    .s-home-sub { font-size:7px; color:#93C5FD; }
+    .s-home-body { padding:10px; }
+    .s-new-btn { background:#22A353; border-radius:10px; color:#fff; font-size:9px; font-weight:700; text-align:center; padding:10px 8px; margin-bottom:10px; }
+    .s-fiche { background:#fff; border-radius:8px; border:1px solid #E5E7EB; padding:8px 10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+    .s-fiche-num { font-size:8px; font-weight:700; color:#1B3A6B; }
+    .s-fiche-client { font-size:7px; color:#6B7280; }
+    .s-badge-ok { background:#DCFCE7; color:#166534; font-size:7px; padding:2px 6px; border-radius:8px; font-weight:600; }
+    .s-badge-prog { background:#FEF3C7; color:#92400E; font-size:7px; padding:2px 6px; border-radius:8px; font-weight:600; }
+
+    /* ── Step 1 ── */
+    .s-step { background:#F8FAFC; min-height:380px; }
+    .s-step-hdr { background:#1B3A6B; padding:10px 12px; }
+    .s-step-hdr-txt { color:#fff; font-size:9px; font-weight:700; letter-spacing:1px; }
+    .s-step-prog { display:flex; gap:3px; padding:6px 12px; background:#0F2552; }
+    .s-prog-dot { flex:1; height:4px; border-radius:2px; }
+    .s-step-body { padding:10px; }
+    .s-inp { background:#fff; border:1px solid #E5E7EB; border-radius:6px; padding:5px 8px; margin-bottom:5px; font-size:8px; color:#374151; }
+    .s-inp label { color:#1B3A6B; font-size:7px; font-weight:700; display:block; }
+    .s-section-lbl { color:#1B3A6B; font-size:8px; font-weight:700; margin:8px 0 4px; }
+    .s-radio-row { display:flex; gap:4px; margin-bottom:4px; }
+    .s-radio { background:#fff; border:1px solid #E5E7EB; border-radius:12px; padding:3px 7px; font-size:7px; color:#374151; }
+    .s-radio.sel { background:#22A353; color:#fff; border-color:#22A353; }
+
+    /* ── Step 3 ── */
+    .s3-cards { display:flex; gap:6px; padding:10px; }
+    .s3-card { flex:1; border-radius:10px; border:1.5px solid #E5E7EB; overflow:hidden; }
+    .s3-card.sel { border-color:#22A353; }
+    .s3-img { height:80px; background:#F1F5F9; display:flex; align-items:center; justify-content:center; font-size:28px; position:relative; }
+    .s3-check { position:absolute; top:4px; right:4px; background:#22A353; color:#fff; border-radius:50%; width:14px; height:14px; font-size:8px; display:flex; align-items:center; justify-content:center; }
+    .s3-lbl { padding:4px 6px; font-size:8px; text-align:center; }
+    .s3-card.sel .s3-lbl { background:#DCFCE7; color:#166534; font-weight:700; }
+    .s3-banner { background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; margin:0 10px; padding:6px 8px; display:flex; align-items:center; gap:6px; font-size:8px; color:#166534; font-weight:600; }
+
+    /* ── Step 5 ── */
+    .s5-recap { background:#fff; border:1px solid #E5E7EB; border-radius:8px; margin:8px; padding:8px; }
+    .s5-row { display:flex; justify-content:space-between; border-bottom:1px solid #F3F4F6; padding:3px 0; font-size:7px; }
+    .s5-row span { color:#6B7280; } .s5-row b { color:#1B3A6B; }
+    .s5-price-box { background:#DCFCE7; border-radius:8px; margin:8px; padding:8px; display:flex; justify-content:space-between; align-items:center; }
+    .s5-price-lbl { font-size:8px; color:#166534; font-weight:700; }
+    .s5-price-val { font-size:13px; font-weight:900; color:#166534; }
+    .s5-btn-pdf { background:#C62828; border-radius:8px; color:#fff; font-size:8px; font-weight:700; text-align:center; padding:7px; margin:4px 8px; }
+    .s5-btn-ok { background:#22A353; border-radius:8px; color:#fff; font-size:8px; font-weight:700; text-align:center; padding:7px; margin:4px 8px; }
+
+    /* ── Admin dashboard ── */
+    .s-dash { background:#F1F5F9; min-height:380px; }
+    .s-dash-hdr { background:linear-gradient(135deg,#1B3A6B,#0F2552); padding:12px; }
+    .s-dash-title { color:#fff; font-size:10px; font-weight:700; }
+    .s-dash-sub { color:#93C5FD; font-size:7px; }
+    .s-kpi-row { display:flex; gap:5px; padding:8px; }
+    .s-kpi { flex:1; background:#fff; border-radius:8px; padding:7px 5px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+    .s-kpi-val { font-size:14px; font-weight:900; color:#1B3A6B; }
+    .s-kpi-lbl { font-size:6px; color:#6B7280; }
+    .s-table-hdr { display:flex; gap:3px; background:#1B3A6B; padding:4px 8px; }
+    .s-th { flex:1; color:#93C5FD; font-size:6px; font-weight:700; }
+    .s-table-row { display:flex; gap:3px; padding:4px 8px; border-bottom:1px solid #E5E7EB; background:#fff; }
+    .s-td { flex:1; font-size:6px; color:#374151; }
+    .s-td .badge-g { background:#DCFCE7; color:#166534; border-radius:4px; padding:1px 3px; font-size:5px; }
+    .s-td .badge-y { background:#FEF3C7; color:#92400E; border-radius:4px; padding:1px 3px; font-size:5px; }
+
+    /* ── Step 2 ── */
+    .s2-switch-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; }
+    .s2-switch { width:26px; height:14px; background:#22A353; border-radius:7px; position:relative; }
+    .s2-switch.off { background:#D1D5DB; }
+    .s2-thumb { width:12px; height:12px; background:#fff; border-radius:50%; position:absolute; top:1px; right:1px; }
+    .s2-thumb.off { right:auto; left:1px; }
+    .s2-anomalie { display:inline-block; background:#FEE2E2; color:#991B1B; border-radius:4px; padding:1px 4px; font-size:6px; }
+    .s2-ok { display:inline-block; background:#DCFCE7; color:#166534; border-radius:4px; padding:1px 4px; font-size:6px; }
+  </style>
+
+  <!-- ══ ÉCRAN 1 : LOGIN ══ -->
+  <h2>8.1 — Écran de Connexion (Login)</h2>
+  <div class="mock-wrap">
+    <div class="phone">
+      <div class="phone-bar"><span></span></div>
+      <div class="phone-screen">
+        <div class="s-login">
+          <div class="s-sun"></div>
+          <img src="assets/images/logo_dark.png" alt="Cleanoov" style="height:32px;object-fit:contain;margin-bottom:2px;filter:brightness(0) invert(1);">
+          <div class="s-tagline">Nettoyage Intelligent de Panneaux PV</div>
+          <div class="s-field"><label>Adresse email</label>technicien@cleanoov.com</div>
+          <div class="s-field"><label>Mot de passe</label>••••••••</div>
+          <div class="s-btn">SE CONNECTER</div>
+          <div class="s-link">Créer un compte</div>
+          <div class="s-btn-admin">👑 Espace Administration</div>
+          <div class="s-link">Mot de passe oublié ?</div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-info">
+      <h3>Écran de Connexion</h3>
+      <ul>
+        <li>Fond dégradé sombre avec animation solaire (CustomPainter)</li>
+        <li>Logo CLEANOOV avec "N" en vert (couleur charte Cleanoov)</li>
+        <li>Champ Email et Mot de passe avec validation</li>
+        <li>Bouton "SE CONNECTER" — appel Firebase Auth</li>
+        <li>Lien "Créer un compte" vers SignupScreen</li>
+        <li>Bouton jaune "Espace Administration" vers AdminLoginScreen</li>
+        <li>Lien "Mot de passe oublié" → dialog avec envoi email Firebase</li>
+        <li>Redirection automatique si déjà connecté (AuthGate)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ ÉCRAN 2 : HOME ══ -->
+  <h2>8.2 — Écran d'Accueil (Home)</h2>
+  <div class="mock-wrap reverse">
+    <div class="phone">
+      <div class="phone-bar"><span></span></div>
+      <div class="phone-screen">
+        <div class="s-home">
+          <div class="s-home-hdr">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="s-home-name">Bonjour, Soulaymen 👋</div>
+                <div class="s-home-sub">Technicien Cleanoov</div>
+              </div>
+              <div style="color:#fff;font-size:9px;background:#ffffff22;padding:3px 6px;border-radius:6px">⏻</div>
+            </div>
+          </div>
+          <div class="s-home-body">
+            <div class="s-new-btn">+ Nouvelle Fiche d'Intervention</div>
+            <div style="font-size:8px;color:#6B7280;margin-bottom:6px;font-weight:600;">FICHES RÉCENTES</div>
+            <div class="s-fiche">
+              <div><div class="s-fiche-num">CLN-20260619-042</div><div class="s-fiche-client">Ahmed Ben Ali — 18/06/2026</div></div>
+              <div class="s-badge-ok">✓ Terminée</div>
+            </div>
+            <div class="s-fiche">
+              <div><div class="s-fiche-num">CLN-20260618-031</div><div class="s-fiche-client">Mohamed Saidi — 17/06/2026</div></div>
+              <div class="s-badge-prog">En cours</div>
+            </div>
+            <div class="s-fiche">
+              <div><div class="s-fiche-num">CLN-20260615-018</div><div class="s-fiche-client">Leila Trabelsi — 15/06/2026</div></div>
+              <div class="s-badge-ok">✓ Terminée</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-info">
+      <h3>Écran d'Accueil</h3>
+      <ul>
+        <li>Header navy avec nom du technicien connecté</li>
+        <li>Bouton "Nouvelle Fiche d'Intervention" (accent vert)</li>
+        <li>Liste des interventions récentes avec N° fiche, client, date</li>
+        <li>Badge de statut coloré : vert "Terminée" / jaune "En cours"</li>
+        <li>Bouton déconnexion (icône) en haut à droite</li>
+        <li>Chargement depuis SharedPreferences (stockage local)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 1 : INFOS CLIENT ══ -->
+  <h2>8.3 — Étape 1 : Informations Client</h2>
+  <div class="mock-wrap">
+    <div class="phone">
+      <div class="phone-bar"><span></span></div>
+      <div class="phone-screen">
+        <div class="s-step">
+          <div class="s-step-hdr">
+            <div class="s-step-hdr-txt">INFORMATIONS CLIENT</div>
+          </div>
+          <div class="s-step-prog">
+            <div class="s-prog-dot" style="background:#22A353"></div>
+            <div class="s-prog-dot" style="background:#ffffff44"></div>
+            <div class="s-prog-dot" style="background:#ffffff44"></div>
+            <div class="s-prog-dot" style="background:#ffffff44"></div>
+            <div class="s-prog-dot" style="background:#ffffff44"></div>
+          </div>
+          <div class="s-step-body">
+            <div class="s-inp"><label>Nom / Prénom client</label>Ahmed Ben Ali</div>
+            <div class="s-inp"><label>Téléphone client</label>23 456 789</div>
+            <div class="s-inp"><label>Adresse d'installation</label>Route de Sfax km 5, Mahdia</div>
+            <div style="display:flex;gap:4px">
+              <div class="s-inp" style="flex:1"><label>Puissance (kWc)</label>10.5</div>
+              <div class="s-inp" style="flex:1"><label>Nb panneaux</label>24</div>
+            </div>
+            <div class="s-inp"><label>Date d'intervention</label>19/06/2026</div>
+            <div class="s-inp"><label>Prochaine intervention (optionnel)</label>—</div>
+            <div style="background:#22A353;border-radius:8px;color:#fff;font-size:8px;font-weight:700;text-align:center;padding:8px;margin-top:8px">
+              Suivant — Avant Nettoyage →
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-info">
+      <h3>Étape 1 — Informations Client & Installation</h3>
+      <ul>
+        <li>Barre de progression 5 étapes en haut (étape 1 active en vert)</li>
+        <li>Saisie nom/prénom, téléphone client, adresse complète</li>
+        <li>Puissance de l'installation (kWc) + nombre de panneaux</li>
+        <li>Sélecteur de date (DatePicker Flutter) pour la date d'intervention</li>
+        <li>Date de prochaine intervention optionnelle</li>
+        <li>Validation des champs avant passage à l'étape suivante</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 2 : AVANT NETTOYAGE ══ -->
+  <h2>8.4 — Étape 2 : Avant Nettoyage</h2>
+  <div class="mock-wrap reverse">
+    <div class="phone">
+      <div class="phone-bar"><span></span></div>
+      <div class="phone-screen">
+        <div class="s-step">
+          <div class="s-step-hdr" style="background:#C62828;">
+            <div class="s-step-hdr-txt">AVANT NETTOYAGE</div>
+          </div>
+          <div class="s-step-prog" style="background:#7F1D1D;">
+            <div class="s-prog-dot" style="background:#fff"></div>
+            <div class="s-prog-dot" style="background:#C62828;border:1px solid #fff"></div>
+            <div class="s-prog-dot" style="background:#ffffff44"></div>
+            <div class="s-prog-dot" style="background:#ffffff44"></div>
+            <div class="s-prog-dot" style="background:#ffffff44"></div>
+          </div>
+          <div class="s-step-body">
+            <div class="s-inp"><label>Puissance mesurée avant (W)</label>8 200 W</div>
+            <div class="s-section-lbl">Niveau d'encrassement</div>
+            <div class="s-radio-row">
+              <div class="s-radio">Léger</div>
+              <div class="s-radio sel">Moyen</div>
+              <div class="s-radio">Sévère</div>
+            </div>
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:6px;padding:6px 8px;margin-bottom:4px;">
+              <div class="s-section-lbl" style="margin:0 0 4px">État des composants</div>
+              <div style="display:flex;justify-content:space-between;font-size:7px;padding:2px 0;border-bottom:1px solid #F3F4F6">
+                <span>Coffret AC</span><span class="s2-ok">OK</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:7px;padding:2px 0;border-bottom:1px solid #F3F4F6">
+                <span>Onduleur</span><span class="s2-ok">OK</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:7px;padding:2px 0">
+                <span>Coffret DC</span><span class="s2-anomalie">Anomalie</span>
+              </div>
+            </div>
+            <div class="s2-switch-row" style="font-size:7px">
+              <span>Points chauds (hot-spots)</span>
+              <div class="s2-switch off"><div class="s2-thumb off"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-info">
+      <h3>Étape 2 — Diagnostic Avant Nettoyage</h3>
+      <ul>
+        <li>Saisie de la puissance mesurée avant nettoyage (Watts)</li>
+        <li>Niveau d'encrassement : Léger / Moyen / Sévère (RadioGroup)</li>
+        <li>Switch points chauds (hot-spots) avec compteur si activé</li>
+        <li>Switch fissures / micro-cracks avec compteur</li>
+        <li>État de 6 composants : Coffret AC, Onduleur, Visserie,<br>Câbles MC4, Coffret DC, Structure/Ancrages</li>
+        <li>Switch ombrage partiel</li>
+        <li>Zone d'observations libres (textarea)</li>
+        <li>Capture de photos (caméra ou galerie, preview inline)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 3 : NETTOYAGE ══ -->
+  <h2>8.5 — Étape 3 : Nettoyage Effectué</h2>
+  <div class="mock-wrap">
+    <div class="phone">
+      <div class="phone-bar"><span></span></div>
+      <div class="phone-screen">
+        <div class="s-step">
+          <div class="s-step-hdr" style="background:#1B5E20;">
+            <div class="s-step-hdr-txt">NETTOYAGE EFFECTUÉ</div>
+          </div>
+          <div class="s-step-prog" style="background:#145214;">
+            <div class="s-prog-dot" style="background:#fff"></div>
+            <div class="s-prog-dot" style="background:#fff"></div>
+            <div class="s-prog-dot" style="background:#22A353;border:1px solid #fff"></div>
+            <div class="s-prog-dot" style="background:#ffffff44"></div>
+            <div class="s-prog-dot" style="background:#ffffff44"></div>
+          </div>
+          <div style="padding:8px 10px 4px;font-size:8px;font-weight:600;color:#374151;">Méthode de nettoyage</div>
+          <div class="s3-cards">
+            <div class="s3-card">
+              <div class="s3-img" style="padding:4px;">
+                <img src="assets/images/brosse.jpg.jpeg" style="width:100%;height:100%;object-fit:contain;">
+                <div style="position:absolute;bottom:4px;left:4px;background:#00000099;color:#fff;font-size:6px;padding:1px 4px;border-radius:4px">Brosse Manuelle</div>
+              </div>
+              <div class="s3-lbl" style="color:#6B7280;font-size:7px">Nettoyage à la brosse</div>
+            </div>
+            <div class="s3-card sel">
+              <div class="s3-img" style="background:#DCFCE7;padding:4px;">
+                <img src="assets/images/robot.jpg.png" style="width:100%;height:100%;object-fit:contain;">
+                <div class="s3-check">✓</div>
+                <div style="position:absolute;bottom:4px;left:4px;background:#00000099;color:#fff;font-size:6px;padding:1px 4px;border-radius:4px">Robot Auto.</div>
+              </div>
+              <div class="s3-lbl">Robot Cleanoov</div>
+            </div>
+          </div>
+          <div class="s3-banner"><img src="assets/images/robot.jpg.png" style="height:20px;width:20px;object-fit:contain;border-radius:4px;"> <span>Robot Automatique Cleanoov</span></div>
+          <div style="padding:8px 10px">
+            <div class="s-inp"><label>Produit utilisé</label>Eau déminéralisée</div>
+            <div class="s-inp"><label>Durée par jour</label>3 heures</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-info">
+      <h3>Étape 3 — Nettoyage Effectué</h3>
+      <ul>
+        <li>Sélection visuelle par carte-image : Brosse Manuelle vs Robot Automatique</li>
+        <li>Overlay vert + icône ✓ sur la méthode sélectionnée</li>
+        <li>Bandeau récapitulatif animé de la méthode choisie</li>
+        <li>Produit utilisé (saisie libre)</li>
+        <li>Durée d'intervention par jour en heures</li>
+        <li>Transition animée entre les sélections (AnimationController)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ ÉTAPE 5 : VALIDATION ══ -->
+  <h2>8.6 — Étape 5 : Validation & Génération PDF</h2>
+  <div class="mock-wrap reverse">
+    <div class="phone">
+      <div class="phone-bar"><span></span></div>
+      <div class="phone-screen">
+        <div class="s-step">
+          <div class="s-step-hdr">
+            <div class="s-step-hdr-txt">VALIDATION FINALE</div>
+          </div>
+          <div class="s-step-prog">
+            <div class="s-prog-dot" style="background:#fff"></div>
+            <div class="s-prog-dot" style="background:#fff"></div>
+            <div class="s-prog-dot" style="background:#fff"></div>
+            <div class="s-prog-dot" style="background:#fff"></div>
+            <div class="s-prog-dot" style="background:#22A353;border:1px solid #fff"></div>
+          </div>
+          <div style="padding:8px;font-size:7px;color:#6B7280;font-weight:700">RÉCAPITULATIF</div>
+          <div class="s5-recap">
+            <div class="s5-row"><span>Client</span><b>Ahmed Ben Ali</b></div>
+            <div class="s5-row"><span>Puissance avant</span><b>8 200 W</b></div>
+            <div class="s5-row"><span>Puissance après</span><b>9 800 W (+19.5%)</b></div>
+            <div class="s5-row"><span>Méthode</span><b>Robot Automatique</b></div>
+            <div class="s5-row"><span>État général</span><b>Bon</b></div>
+          </div>
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;margin:0 8px;padding:8px;">
+            <div style="font-size:7px;color:#1B3A6B;font-weight:700;margin-bottom:4px">Prix de la mission (TND) *</div>
+            <div style="background:#F8FAFC;border:2px solid #22A353;border-radius:6px;padding:5px 8px;font-size:11px;font-weight:700;color:#1B3A6B">250.000</div>
+          </div>
+          <div class="s5-price-box">
+            <div class="s5-price-lbl">TOTAL MISSION</div>
+            <div class="s5-price-val">250.000 TND</div>
+          </div>
+          <div class="s5-btn-pdf">📄 Générer le Rapport PDF</div>
+          <div class="s5-btn-ok">✅ Terminer la Mission</div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-info">
+      <h3>Étape 5 — Validation & Export PDF</h3>
+      <ul>
+        <li>Récapitulatif complet de toutes les données saisies</li>
+        <li>Calcul automatique du gain de puissance (%)</li>
+        <li>Champ prix obligatoire — validation avec message d'erreur rouge</li>
+        <li>Affichage total mission (TND) mis en évidence</li>
+        <li>Case à cocher "Lu et approuvé par le client"</li>
+        <li>Bouton rouge "Générer le Rapport PDF" → PdfService</li>
+        <li>Bouton vert "Terminer la Mission" → sauvegarde + retour accueil</li>
+        <li>Dialog de confirmation avant finalisation définitive</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ ADMIN DASHBOARD ══ -->
+  <h2>8.7 — Tableau de Bord Administrateur</h2>
+  <div class="mock-wrap">
+    <div class="phone">
+      <div class="phone-bar"><span></span></div>
+      <div class="phone-screen">
+        <div class="s-dash">
+          <div class="s-dash-hdr">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="s-dash-title">TABLEAU DE BORD</div>
+                <div class="s-dash-sub">Espace Administration Cleanoov</div>
+              </div>
+              <div style="color:#F59E0B;font-size:9px;background:#ffffff22;padding:3px 6px;border-radius:6px">Admin</div>
+            </div>
+          </div>
+          <div class="s-kpi-row">
+            <div class="s-kpi"><div class="s-kpi-val" style="color:#1B3A6B">12</div><div class="s-kpi-lbl">Total missions</div></div>
+            <div class="s-kpi"><div class="s-kpi-val" style="color:#22A353">9</div><div class="s-kpi-lbl">Terminées</div></div>
+            <div class="s-kpi"><div class="s-kpi-val" style="color:#F59E0B;font-size:11px">2 450</div><div class="s-kpi-lbl">Revenu TND</div></div>
+          </div>
+          <div style="background:#fff;border-radius:8px;margin:0 6px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+            <div style="padding:4px 8px;font-size:7px;color:#6B7280;border-bottom:1px solid #F3F4F6;display:flex;justify-content:space-between">
+              <span>🔍 Rechercher...</span><span style="color:#1B3A6B">Filtrer</span>
+            </div>
+            <div class="s-table-hdr">
+              <div class="s-th">N° Fiche</div>
+              <div class="s-th">Client</div>
+              <div class="s-th">Date</div>
+              <div class="s-th">Prix</div>
+              <div class="s-th">Statut</div>
+            </div>
+            <div class="s-table-row">
+              <div class="s-td">CLN-...-042</div>
+              <div class="s-td">A. Ben Ali</div>
+              <div class="s-td">19/06</div>
+              <div class="s-td">250</div>
+              <div class="s-td"><span class="badge-g">✓ OK</span></div>
+            </div>
+            <div class="s-table-row" style="background:#FAFAFA">
+              <div class="s-td">CLN-...-031</div>
+              <div class="s-td">M. Saidi</div>
+              <div class="s-td">17/06</div>
+              <div class="s-td">180</div>
+              <div class="s-td"><span class="badge-y">En cours</span></div>
+            </div>
+            <div class="s-table-row">
+              <div class="s-td">CLN-...-018</div>
+              <div class="s-td">L. Trabels.</div>
+              <div class="s-td">15/06</div>
+              <div class="s-td">320</div>
+              <div class="s-td"><span class="badge-g">✓ OK</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-info">
+      <h3>Tableau de Bord Administrateur</h3>
+      <ul>
+        <li>Accès exclusif : isAdmin = true dans Firestore</li>
+        <li>3 KPI cartes : Total missions, Terminées, Revenu cumulé (TND)</li>
+        <li>Barre de recherche en temps réel sur toutes les interventions</li>
+        <li>Tableau paginé : N° Fiche, Technicien, Client, Date, Prix, Statut</li>
+        <li>Badge statut coloré (vert / jaune) par ligne</li>
+        <li>Bouton PDF par ligne pour télécharger le rapport</li>
+        <li>Données chargées depuis SharedPreferences (local)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Structure du rapport PDF généré</h2>
+  <table>
+    <thead><tr><th>Section PDF</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td>En-tête</td><td>Logo Cleanoov, coordonnées, N° fiche, titre document</td></tr>
+      <tr><td>Infos Client</td><td>Nom, téléphone, adresse, installation, technicien</td></tr>
+      <tr><td>Avant Nettoyage</td><td>Puissance, encrassement, état composants, hot-spots</td></tr>
+      <tr><td>Nettoyage Effectué</td><td>Méthode, produit, durée</td></tr>
+      <tr><td>Après Nettoyage</td><td>Puissance après, gain %, état général, recommandation</td></tr>
+      <tr><td>Photos</td><td>Photo avant + photo après nettoyage côte à côte</td></tr>
+      <tr><td>Facturation</td><td>Désignation prestation, montant total (TND)</td></tr>
+      <tr><td>Validation</td><td>Signature technicien, espace signature client, copies</td></tr>
+      <tr><td>Pied de page</td><td>Nom société, date génération, numéro de page</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── 9. TECH STACK -->
+  <div class="page-break"></div>
+  <h1 id="tech"><span class="section-number">9</span> Stack Technologique</h1>
+
+  <div class="tech-stack">
+    <div class="tech-item">
+      <div class="tech-name">Flutter</div>
+      <div class="tech-version">v3.44.2</div>
+      <div class="tech-role">Framework UI cross-platform (Android, iOS, Web)</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Dart</div>
+      <div class="tech-version">v3.x</div>
+      <div class="tech-role">Langage de programmation orienté objet</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Firebase Auth</div>
+      <div class="tech-version">v5.5.2</div>
+      <div class="tech-role">Authentification sécurisée email/mot de passe</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">Cloud Firestore</div>
+      <div class="tech-version">v5.6.6</div>
+      <div class="tech-role">Base de données NoSQL cloud temps réel</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">pdf</div>
+      <div class="tech-version">v3.13.0</div>
+      <div class="tech-role">Génération de rapports PDF professionnels</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">printing</div>
+      <div class="tech-version">v5.x</div>
+      <div class="tech-role">Partage et téléchargement du PDF généré</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">image_picker</div>
+      <div class="tech-version">v1.x</div>
+      <div class="tech-role">Capture photos caméra et sélection galerie</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">shared_preferences</div>
+      <div class="tech-version">v2.x</div>
+      <div class="tech-role">Persistance locale des fiches (JSON)</div>
+    </div>
+    <div class="tech-item">
+      <div class="tech-name">intl</div>
+      <div class="tech-version">v0.x</div>
+      <div class="tech-role">Formatage des dates en français</div>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Package Flutter</th><th>Version</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td>firebase_core</td><td>^3.13.1</td><td>Initialisation Firebase</td></tr>
+      <tr><td>firebase_auth</td><td>^5.5.2</td><td>Authentification utilisateurs</td></tr>
+      <tr><td>cloud_firestore</td><td>^5.6.6</td><td>Profils techniciens en cloud</td></tr>
+      <tr><td>pdf</td><td>^3.13.0</td><td>Génération rapports PDF</td></tr>
+      <tr><td>printing</td><td>^5.x</td><td>Partage / impression PDF</td></tr>
+      <tr><td>image_picker</td><td>^1.x</td><td>Capture et sélection photos</td></tr>
+      <tr><td>shared_preferences</td><td>^2.x</td><td>Stockage local JSON</td></tr>
+      <tr><td>intl</td><td>^0.x</td><td>Localisation française</td></tr>
+      <tr><td>uuid</td><td>^4.x</td><td>Génération identifiants uniques</td></tr>
+      <tr><td>path_provider</td><td>^2.x</td><td>Accès au système de fichiers</td></tr>
+    </tbody>
+  </table>
+
+  <div class="success-box">
+    <strong>Résultat :</strong> L'application Cleanoov offre une solution complète et professionnelle pour la digitalisation des interventions de nettoyage de panneaux photovoltaïques, en combinant une interface utilisateur intuitive, une synchronisation cloud sécurisée, et une génération automatique de rapports PDF conformes aux exigences professionnelles.
+  </div>
+
+  <div class="footer">
+    <p><strong>CLEANOOV</strong> — Documentation Logicielle — Rapport PFE 2025/2026</p>
+    <p>Développé avec Flutter 3.44 &amp; Firebase — Souleyman Bayoudh</p>
+  </div>
+
+</div>
+</body>
+</html>

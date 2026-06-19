@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "936029076848",
+    "project_id": "cleanoov-app-a33e3",
+    "storage_bucket": "cleanoov-app-a33e3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:936029076848:android:507d233c182e6b58d7e3b5",
+        "android_client_info": {
+          "package_name": "com.cleanoov.cleanoovapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "936029076848-949ins52jg4p6m29qv4dfdse1fb01nvm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4J1zhPOf4GyMP3wGt5Hhli15BHOxpAWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "936029076848-949ins52jg4p6m29qv4dfdse1fb01nvm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
