@@ -204,16 +204,33 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: _logout,
-                        child: Container(
-                          padding: const EdgeInsets.all(7),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(15),
-                            borderRadius: BorderRadius.circular(20),
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _logout,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withAlpha(40),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: Colors.red.withAlpha(80), width: 1),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.logout,
+                                    color: Colors.redAccent, size: 18),
+                                SizedBox(width: 6),
+                                Text('Quitter',
+                                    style: TextStyle(
+                                        color: Colors.redAccent,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600)),
+                              ],
+                            ),
                           ),
-                          child: const Icon(Icons.logout,
-                              color: Colors.white60, size: 16),
                         ),
                       ),
                     ],
