@@ -146,12 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeader() {
-    final now = DateTime.now();
-    final greeting = now.hour < 12
-        ? 'Bonjour'
-        : now.hour < 18
-            ? 'Bon après-midi'
-            : 'Bonsoir';
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -227,14 +221,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              Text(
-                '$greeting, ${widget.technicienName.split(' ').first} 👋',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
               const SizedBox(height: 4),
               Text(
                 '${_interventions.length} intervention${_interventions.length != 1 ? 's' : ''} enregistrée${_interventions.length != 1 ? 's' : ''}',
