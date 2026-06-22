@@ -13,12 +13,14 @@ class InterventionFlow extends StatefulWidget {
   final String technicien;
   final String technicienTel;
   final InterventionModel? existing;
+  final bool fromAdmin;
 
   const InterventionFlow({
     super.key,
     required this.technicien,
     this.technicienTel = '',
     this.existing,
+    this.fromAdmin = false,
   });
 
   @override
@@ -82,6 +84,10 @@ class _InterventionFlowState extends State<InterventionFlow> {
     Navigator.pop(context, true);
   }
 
+  void _goToDashboard() {
+    Navigator.pop(context, true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,6 +104,21 @@ class _InterventionFlowState extends State<InterventionFlow> {
             }
           },
         ),
+        actions: widget.fromAdmin
+            ? [
+                TextButton.icon(
+                  onPressed: _goToDashboard,
+                  icon: const Icon(Icons.dashboard_outlined,
+                      color: Colors.white, size: 18),
+                  label: const Text('Dashboard',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600)),
+                ),
+                const SizedBox(width: 4),
+              ]
+            : null,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(72),
           child: _buildStepIndicator(),

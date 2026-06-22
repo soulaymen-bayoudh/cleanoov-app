@@ -5,6 +5,7 @@ import '../../models/intervention_model.dart';
 import '../../services/pdf_service.dart';
 import '../../services/storage_service.dart';
 import '../login_screen.dart';
+import '../intervention_flow.dart';
 import '../../services/auth_service.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -50,6 +51,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   double get _totalRevenu => _all.fold(0, (s, m) => s + m.prixMission);
   int get _nbTerminees => _all.where((m) => m.termine).length;
+
+  Future<void> _openIntervention(InterventionModel m) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => InterventionFlow(
+          technicien: m.technicien,
+          technicienTel: m.technicienTelephone,
+          existing: m,
+          fromAdmin: true,
+        ),
+      ),
+    );
+    _load();
+  }
 
   Future<void> _logout() async {
     final ok = await showDialog<bool>(
@@ -164,7 +180,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               child: Row(
                 children: [
                   Image.asset('assets/images/logo_dark.png', height: 30,
-                      errorBuilder: (_, __, e) => const Text('CLEANOOV',
+                      errorBuilder: (ctx, err, st) => const Text('CLEANOOV',
                           style: TextStyle(color: Colors.white,
                               fontWeight: FontWeight.w900, fontSize: 16))),
                   const SizedBox(width: 10),
@@ -254,7 +270,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   Widget _buildCard(InterventionModel m, DateFormat fmt) {
     final statusColor = m.termine ? AppColors.cleanoovGreen : Colors.orange;
-    return Container(
+    return InkWell(
+      onTap: () => _openIntervention(m),
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: const Color(0xFF1A1F2E),
@@ -365,6 +384,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 
