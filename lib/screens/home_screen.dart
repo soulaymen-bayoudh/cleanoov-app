@@ -204,33 +204,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _logout,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.red.withAlpha(40),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                  color: Colors.red.withAlpha(80), width: 1),
-                            ),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.logout,
-                                    color: Colors.redAccent, size: 18),
-                                SizedBox(width: 6),
-                                Text('Quitter',
-                                    style: TextStyle(
-                                        color: Colors.redAccent,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600)),
-                              ],
-                            ),
-                          ),
+                      ElevatedButton.icon(
+                        onPressed: _logout,
+                        icon: const Icon(Icons.logout, size: 16),
+                        label: const Text('Quitter',
+                            style: TextStyle(fontSize: 13,
+                                fontWeight: FontWeight.w700)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade700,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(0, 42),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          elevation: 0,
                         ),
                       ),
                     ],

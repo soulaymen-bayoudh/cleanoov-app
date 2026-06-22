@@ -4,6 +4,8 @@ import '../../theme/app_theme.dart';
 import '../../models/intervention_model.dart';
 import '../../services/pdf_service.dart';
 import '../../services/storage_service.dart';
+import '../login_screen.dart';
+import '../../services/auth_service.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -17,8 +19,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   List<InterventionModel> _filtered = [];
   bool _loading = true;
   String _search = '';
-  String _sortField = 'date';
-  bool _sortAsc = false;
 
   @override
   void initState() {
@@ -40,74 +40,114 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   void _applyFilter() {
     final q = _search.toLowerCase();
-    _filtered = _all.where((m) {
-      return m.technicien.toLowerCase().contains(q) ||
-          m.technicienTelephone.contains(q) ||
-          m.nomPrenom.toLowerCase().contains(q) ||
-          m.numeroFiche.toLowerCase().contains(q);
-    }).toList();
-    _sortList();
+    _filtered = _all.where((m) =>
+      m.technicien.toLowerCase().contains(q) ||
+      m.nomPrenom.toLowerCase().contains(q) ||
+      m.numeroFiche.toLowerCase().contains(q)
+    ).toList()
+      ..sort((a, b) => b.dateIntervention.compareTo(a.dateIntervention));
   }
 
-  void _sortList() {
-    _filtered.sort((a, b) {
-      int cmp;
-      switch (_sortField) {
-        case 'technicien':
-          cmp = a.technicien.compareTo(b.technicien);
-          break;
-        case 'client':
-          cmp = a.nomPrenom.compareTo(b.nomPrenom);
-          break;
-        case 'prix':
-          cmp = a.prixMission.compareTo(b.prixMission);
-          break;
-        default:
-          cmp = a.dateIntervention.compareTo(b.dateIntervention);
-      }
-      return _sortAsc ? cmp : -cmp;
-    });
+  double get _totalRevenu => _all.fold(0, (s, m) => s + m.prixMission);
+  int get _nbTerminees => _all.where((m) => m.termine).length;
+
+  Future<void> _logout() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Déconnexion Admin'),
+        content: const Text('Voulez-vous quitter l\'espace admin ?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false),
+              child: const Text('Annuler')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger,
+                minimumSize: const Size(0, 38)),
+            child: const Text('Déconnexion'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await AuthService.signOut();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (r) => false);
+    }
   }
-
-  void _setSort(String field) {
-    setState(() {
-      if (_sortField == field) {
-        _sortAsc = !_sortAsc;
-      } else {
-        _sortField = field;
-        _sortAsc = false;
-      }
-      _sortList();
-    });
-  }
-
-  double get _totalRevenu =>
-      _filtered.fold(0, (sum, m) => sum + m.prixMission);
-
-  int get _nbTerminees => _filtered.where((m) => m.termine).length;
 
   @override
   Widget build(BuildContext context) {
-    final fmt = DateFormat('dd/MM/yyyy');
+    final fmt = DateFormat('dd/MM/yyyy', 'fr');
     return Scaffold(
       backgroundColor: const Color(0xFF0F1117),
       body: Column(
         children: [
           _buildHeader(),
+          // Barre de recherche
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: TextField(
+              onChanged: (v) => setState(() { _search = v; _applyFilter(); }),
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: 'Rechercher client, technicien, N° fiche...',
+                hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+                prefixIcon: const Icon(Icons.search, color: Colors.white38),
+                filled: true,
+                fillColor: Colors.white.withAlpha(10),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.white.withAlpha(20)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.white.withAlpha(20)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.cleanoovGreen),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('${_filtered.length} mission${_filtered.length != 1 ? 's' : ''}',
+                    style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                Text('Total : ${_totalRevenu.toStringAsFixed(2)} TND',
+                    style: const TextStyle(color: Colors.amber,
+                        fontSize: 13, fontWeight: FontWeight.w700)),
+              ],
+            ),
+          ),
           Expanded(
             child: _loading
-                ? const Center(
-                    child: CircularProgressIndicator(color: AppColors.cleanoovGreen))
+                ? const Center(child: CircularProgressIndicator(color: AppColors.cleanoovGreen))
                 : _filtered.isEmpty
                     ? _buildEmpty()
-                    : _buildTable(fmt),
+                    : RefreshIndicator(
+                        onRefresh: _load,
+                        color: AppColors.cleanoovGreen,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                          itemCount: _filtered.length,
+                          itemBuilder: (_, i) => _buildCard(_filtered[i], fmt),
+                        ),
+                      ),
           ),
         ],
       ),
     );
   }
 
-  // ── Header ────────────────────────────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
       decoration: const BoxDecoration(
@@ -118,23 +158,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         bottom: false,
         child: Column(
           children: [
+            // Top row — logo + logout
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white54, size: 20),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(width: 8),
-                  Image.asset(
-                    'assets/images/logo_dark.png',
-                    height: 28,
-                    errorBuilder: (ctx, e, t) => const Text(
-                      'CLEANOOV',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16),
-                    ),
-                  ),
+                  Image.asset('assets/images/logo_dark.png', height: 30,
+                      errorBuilder: (_, __, e) => const Text('CLEANOOV',
+                          style: TextStyle(color: Colors.white,
+                              fontWeight: FontWeight.w900, fontSize: 16))),
                   const SizedBox(width: 10),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -143,65 +175,50 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: Colors.amber.withAlpha(60)),
                     ),
-                    child: const Text(
-                      'ADMIN',
-                      style: TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.w800),
-                    ),
+                    child: const Text('ADMIN',
+                        style: TextStyle(color: Colors.amber,
+                            fontSize: 10, fontWeight: FontWeight.w800)),
                   ),
                   const Spacer(),
+                  // Bouton refresh
                   IconButton(
-                    icon: const Icon(Icons.refresh, color: Colors.white54, size: 20),
+                    icon: const Icon(Icons.refresh, color: Colors.white54, size: 22),
                     onPressed: _load,
+                    tooltip: 'Actualiser',
+                  ),
+                  const SizedBox(width: 4),
+                  // Bouton déconnexion — grand et visible
+                  ElevatedButton.icon(
+                    onPressed: _logout,
+                    icon: const Icon(Icons.logout, size: 16),
+                    label: const Text('Quitter', style: TextStyle(fontSize: 13)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.danger,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(0, 40),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // KPI stats
+            // KPI cards
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               child: Row(
                 children: [
-                  _kpi('${_all.length}', 'Interventions', Icons.solar_power, AppColors.cleanoovGreen),
+                  _kpi('${_all.length}', 'Total', Icons.solar_power,
+                      AppColors.cleanoovGreen),
                   const SizedBox(width: 10),
-                  _kpi('$_nbTerminees', 'Terminées', Icons.check_circle_outline, Colors.blue),
+                  _kpi('$_nbTerminees', 'Terminées',
+                      Icons.check_circle_outline, Colors.blue),
                   const SizedBox(width: 10),
-                  _kpi(
-                    '${_totalRevenu.toStringAsFixed(0)} TND',
-                    'Revenu total',
-                    Icons.payments_outlined,
-                    Colors.amber,
-                  ),
+                  _kpi('${_totalRevenu.toStringAsFixed(0)} TND', 'Revenu',
+                      Icons.payments_outlined, Colors.amber),
                 ],
-              ),
-            ),
-
-            // Barre de recherche
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              child: TextField(
-                onChanged: (v) => setState(() { _search = v; _applyFilter(); }),
-                style: const TextStyle(color: Colors.white, fontSize: 13),
-                decoration: InputDecoration(
-                  hintText: 'Rechercher technicien, client, N° fiche...',
-                  hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white38, size: 18),
-                  filled: true,
-                  fillColor: Colors.white.withAlpha(10),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.white.withAlpha(15)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.white.withAlpha(15)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.cleanoovGreen),
-                  ),
-                ),
               ),
             ),
           ],
@@ -210,238 +227,171 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  // ── KPI Box ───────────────────────────────────────────────────────────────
   Widget _kpi(String value, String label, IconData icon, Color color) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: color.withAlpha(15),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: color.withAlpha(40)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 16),
-            const SizedBox(height: 4),
-            Text(value, style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.w800)),
-            Text(label, style: const TextStyle(color: Colors.white38, fontSize: 10)),
+            Icon(icon, color: color, size: 18),
+            const SizedBox(height: 6),
+            Text(value,
+                style: TextStyle(color: color, fontSize: 15,
+                    fontWeight: FontWeight.w800)),
+            Text(label,
+                style: const TextStyle(color: Colors.white38, fontSize: 11)),
           ],
         ),
       ),
     );
   }
 
-  // ── Tableau ───────────────────────────────────────────────────────────────
-  Widget _buildTable(DateFormat fmt) {
-    return Column(
-      children: [
-        // En-têtes colonnes
-        Container(
-          color: const Color(0xFF1F2937),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Row(
-            children: [
-              _headerCell('N° Fiche', flex: 3, field: 'fiche'),
-              _headerCell('Technicien', flex: 3, field: 'technicien'),
-              _headerCell('Téléphone', flex: 2),
-              _headerCell('Client', flex: 3, field: 'client'),
-              _headerCell('Date', flex: 2, field: 'date'),
-              _headerCell('Prix (TND)', flex: 2, field: 'prix'),
-              _headerCell('Statut', flex: 2),
-              _headerCell('PDF', flex: 2),
-            ],
-          ),
-        ),
-        // Lignes
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: _load,
-            color: AppColors.cleanoovGreen,
-            child: ListView.builder(
-              itemCount: _filtered.length,
-              itemBuilder: (ctx, i) => _buildRow(_filtered[i], fmt, i),
-            ),
-          ),
-        ),
-        // Pied de tableau — total
-        Container(
-          color: const Color(0xFF1F2937),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${_filtered.length} mission${_filtered.length != 1 ? 's' : ''}',
-                style: const TextStyle(color: Colors.white54, fontSize: 12),
-              ),
-              Row(
-                children: [
-                  const Text('Total : ', style: TextStyle(color: Colors.white54, fontSize: 12)),
-                  Text(
-                    '${_totalRevenu.toStringAsFixed(2)} TND',
-                    style: const TextStyle(
-                      color: Colors.amber,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _headerCell(String label, {int flex = 1, String? field}) {
-    final active = field != null && _sortField == field;
-    return Expanded(
-      flex: flex,
-      child: GestureDetector(
-        onTap: field != null ? () => _setSort(field) : null,
-        child: Row(
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: active ? AppColors.cleanoovGreen : Colors.white38,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (active)
-              Icon(
-                _sortAsc ? Icons.arrow_upward : Icons.arrow_downward,
-                size: 10,
-                color: AppColors.cleanoovGreen,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRow(InterventionModel m, DateFormat fmt, int index) {
-    final isEven = index % 2 == 0;
+  Widget _buildCard(InterventionModel m, DateFormat fmt) {
     final statusColor = m.termine ? AppColors.cleanoovGreen : Colors.orange;
     return Container(
-      color: isEven ? const Color(0xFF111827) : const Color(0xFF0F1117),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      child: Row(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1F2E),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withAlpha(15)),
+      ),
+      child: Column(
         children: [
-          // N° Fiche
-          Expanded(
-            flex: 3,
-            child: Text(
-              m.numeroFiche,
-              style: const TextStyle(
-                color: AppColors.cleanoovGreenLight,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
+          // Barre colorée en haut
+          Container(
+            height: 3,
+            decoration: BoxDecoration(
+              color: statusColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
             ),
           ),
-          // Technicien
-          Expanded(
-            flex: 3,
-            child: Text(
-              m.technicien,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          // Téléphone
-          Expanded(
-            flex: 2,
-            child: Text(
-              m.technicienTelephone.isEmpty ? '—' : m.technicienTelephone,
-              style: const TextStyle(color: Colors.white70, fontSize: 11),
-            ),
-          ),
-          // Client
-          Expanded(
-            flex: 3,
-            child: Text(
-              m.nomPrenom,
-              style: const TextStyle(color: Colors.white70, fontSize: 11),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          // Date
-          Expanded(
-            flex: 2,
-            child: Text(
-              fmt.format(m.dateIntervention),
-              style: const TextStyle(color: Colors.white54, fontSize: 11),
-            ),
-          ),
-          // Prix
-          Expanded(
-            flex: 2,
-            child: Text(
-              m.prixMission > 0 ? '${m.prixMission.toStringAsFixed(0)} TND' : '—',
-              style: TextStyle(
-                color: m.prixMission > 0 ? Colors.amber : Colors.white38,
-                fontSize: 12,
-                fontWeight: m.prixMission > 0 ? FontWeight.w700 : FontWeight.w400,
-              ),
-            ),
-          ),
-          // Statut
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-              decoration: BoxDecoration(
-                color: statusColor.withAlpha(25),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                m.termine ? 'Terminée' : 'En cours',
-                style: TextStyle(
-                  color: statusColor,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          // Bouton PDF
-          Expanded(
-            flex: 2,
-            child: GestureDetector(
-              onTap: () => _generatePdf(m),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                decoration: BoxDecoration(
-                  color: AppColors.danger.withAlpha(20),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: AppColors.danger.withAlpha(60)),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              children: [
+                // Ligne 1 — N° fiche + statut
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(Icons.picture_as_pdf, color: AppColors.danger, size: 12),
-                    SizedBox(width: 4),
-                    Text(
-                      'PDF',
-                      style: TextStyle(
-                        color: AppColors.danger,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                    Text(m.numeroFiche,
+                        style: const TextStyle(
+                            color: AppColors.cleanoovGreenLight,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: statusColor.withAlpha(25),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: statusColor.withAlpha(60)),
+                      ),
+                      child: Text(m.termine ? '✓ Terminée' : '⏳ En cours',
+                          style: TextStyle(color: statusColor,
+                              fontSize: 11, fontWeight: FontWeight.w700)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Divider(color: Color(0xFF2D3748), height: 1),
+                const SizedBox(height: 10),
+
+                // Ligne 2 — Infos
+                Row(
+                  children: [
+                    Expanded(
+                      child: _infoLine(
+                          Icons.person_outline, 'Client', m.nomPrenom),
+                    ),
+                    Expanded(
+                      child: _infoLine(
+                          Icons.engineering, 'Technicien', m.technicien),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _infoLine(Icons.calendar_today,
+                          'Date', fmt.format(m.dateIntervention)),
+                    ),
+                    Expanded(
+                      child: _infoLine(
+                        Icons.payments_outlined,
+                        'Prix',
+                        m.prixMission > 0
+                            ? '${m.prixMission.toStringAsFixed(2)} TND'
+                            : '—',
+                        valueColor: m.prixMission > 0
+                            ? Colors.amber : Colors.white38,
                       ),
                     ),
                   ],
                 ),
-              ),
+                if (m.technicienTelephone.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  _infoLine(Icons.phone_outlined, 'Tél. Technicien',
+                      m.technicienTelephone),
+                ],
+                const SizedBox(height: 12),
+
+                // Bouton PDF — pleine largeur, facile à tapper
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _generatePdf(m),
+                    icon: const Icon(Icons.picture_as_pdf, size: 18),
+                    label: const Text('Générer le Rapport PDF',
+                        style: TextStyle(fontSize: 13,
+                            fontWeight: FontWeight.w600)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.danger,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(0, 44),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _infoLine(IconData icon, String label, String value,
+      {Color? valueColor}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 13, color: Colors.white38),
+        const SizedBox(width: 5),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  style: const TextStyle(
+                      color: Colors.white38, fontSize: 10)),
+              Text(value,
+                  style: TextStyle(
+                      color: valueColor ?? Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500),
+                  overflow: TextOverflow.ellipsis),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -451,10 +401,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erreur PDF: $e'),
-            backgroundColor: AppColors.danger,
-          ),
+          SnackBar(content: Text('Erreur PDF: $e'),
+              backgroundColor: AppColors.danger),
         );
       }
     }
@@ -465,11 +413,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inbox_outlined, size: 60, color: Colors.white.withAlpha(30)),
+          Icon(Icons.inbox_outlined, size: 64,
+              color: Colors.white.withAlpha(30)),
           const SizedBox(height: 16),
           Text(
-            _search.isEmpty ? 'Aucune intervention enregistrée' : 'Aucun résultat',
-            style: const TextStyle(color: Colors.white38, fontSize: 16),
+            _search.isEmpty
+                ? 'Aucune intervention enregistrée'
+                : 'Aucun résultat pour "$_search"',
+            style: const TextStyle(color: Colors.white38, fontSize: 15),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
