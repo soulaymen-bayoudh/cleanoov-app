@@ -24,7 +24,7 @@ class PdfService {
     // Charger le logo depuis les assets
     pw.ImageProvider? logo;
     try {
-      final data = await rootBundle.load('assets/images/logo_dark.png');
+      final data = await rootBundle.load('assets/images/logo.png');
       logo = pw.MemoryImage(data.buffer.asUint8List());
     } catch (_) {
       logo = null;
